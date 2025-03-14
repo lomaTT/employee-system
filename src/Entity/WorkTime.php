@@ -18,7 +18,7 @@ class WorkTime
 
     #[ORM\ManyToOne(inversedBy: 'workTimes')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Employee $employer = null;
+    private ?Employee $employee = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $startDateTime = null;
@@ -34,14 +34,14 @@ class WorkTime
         return $this->id;
     }
 
-    public function getEmployer(): ?Employee
+    public function getEmployee(): ?Employee
     {
-        return $this->employer;
+        return $this->employee;
     }
 
-    public function setEmployer(?Employee $employer): static
+    public function setEmployee(?Employee $employee): static
     {
-        $this->employer = $employer;
+        $this->employee = $employee;
 
         return $this;
     }
