@@ -17,6 +17,7 @@ class CreateEmployeeRequestDto
             maxMessage: 'Name cannot be longer than {{ limit }} characters.'
         )]
         private ?string $name,
+
         #[Assert\NotNull(message: 'Surname is required.')]
         #[Assert\Length(
             min: 1,
@@ -52,5 +53,4 @@ class CreateEmployeeRequestDto
 
         return $this;
     }
-
 }

@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Dto\Request\CreateWorkTimeRequestDto;
+use App\Dto\Request\WorkTimeSummaryRequestDto;
+use App\Service\PaymentService;
+use App\Service\ValidationService;
 use App\Service\WorkTimeService;
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -14,15 +17,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class WorkTimeController extends AbstractController
 {
     public function __construct(
         private readonly SerializerInterface $serializer,
-        private readonly ValidatorInterface $validator,
-        private readonly WorkTimeService $workTimeService,
-        private readonly LoggerInterface $logger
+        private readonly WorkTimeService     $workTimeService,
+        private readonly LoggerInterface     $logger,
+        private readonly ValidationService   $validationService,
+        private readonly PaymentService      $paymentService
     )
     {
     }
@@ -36,19 +39,10 @@ class WorkTimeController extends AbstractController
             'json'
         );
 
-        $violations = $this->validator->validate($createWorkTimeRequestDto);
+        $validationResponse = $this->validationService->validate($createWorkTimeRequestDto);
 
-        if (count($violations) > 0) {
-            $violationMessages = [];
-
-            foreach ($violations as $violation) {
-                $violationMessages[] = $violation->getMessage();
-            }
-
-            return new JsonResponse(
-                ['errors' => $violationMessages],
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
+        if ($validationResponse) {
+            return $validationResponse;
         }
 
         try {
@@ -59,6 +53,42 @@ class WorkTimeController extends AbstractController
             ]);
         } catch (Exception $e) {
             $this->logger->error('Work time creation failed.', ['error' => $e->getMessage()]);
+
+            return new JsonResponse([
+                'error' => $e->getMessage(),
+            ], Response::HTTP_BAD_REQUEST);
+        }
+    }
+
+    #[Route('/work-time/summary/', name: 'work_times_summary', methods: ['GET'])]
+    public function getWorkTimesSummary(Request $request): Response
+    {
+        $queryParameters = $request->query->all();
+
+        /** @var WorkTimeSummaryRequestDto $workTimeSummaryRequestDto */
+        $workTimeSummaryRequestDto = $this->serializer->deserialize(
+            json_encode($queryParameters),
+            WorkTimeSummaryRequestDto::class,
+            'json'
+        );
+
+        $validationResponse = $this->validationService->validate($workTimeSummaryRequestDto);
+
+        if ($validationResponse) {
+            return $validationResponse;
+        }
+
+        try {
+            $timeSummary = $this->workTimeService->getTimeSummary($workTimeSummaryRequestDto);
+
+            $paymentDetails = $this->paymentService->calculatePayment(
+                $timeSummary,
+                $workTimeSummaryRequestDto->getDateType()
+            );
+
+            return new JsonResponse($paymentDetails);
+        } catch (Exception $e) {
+            $this->logger->error('Work time summary request failed.', ['error' => $e->getMessage()]);
 
             return new JsonResponse([
                 'error' => $e->getMessage(),

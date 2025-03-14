@@ -12,10 +12,12 @@ class CreateWorkTimeRequestDto
         #[Assert\DateTime(format: 'd.m.Y H:i', message: 'Start date time must be in date.month.year hours:minutes format.')]
         #[Assert\NotBlank(message: 'Start date time must be not blank.')]
         private ?string $startDateTime,
+
         #[Assert\DateTime(format: 'd.m.Y H:i', message: 'End date time must be in date.month.year hours:minutes format.')]
         #[Assert\NotBlank(message: 'End date time must be not blank.')]
         #[Assert\GreaterThan(propertyPath: 'startDateTime', message: 'End date time must be greater than start date time.')]
         private ?string $endDateTime,
+
         #[Assert\Uuid(message: 'Employee id must be a valid UUID.')]
         #[Assert\NotBlank(message: 'Employee id must be not blank.')]
         private ?string $employeeId

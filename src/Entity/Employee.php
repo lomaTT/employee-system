@@ -94,7 +94,6 @@ class Employee
     public function removeWorkTime(WorkTime $workTime): static
     {
         if ($this->workTimes->removeElement($workTime)) {
-            // set the owning side to null (unless already changed)
             if ($workTime->getEmployee() === $this) {
                 $workTime->setEmployee(null);
             }
