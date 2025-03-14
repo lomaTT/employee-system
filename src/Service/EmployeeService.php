@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Dto\Request\CreateEmployerRequestDto;
+use App\Dto\Request\CreateEmployeeRequestDto;
 use App\Factory\EmployeeFactory;
 use App\Repository\EmployeeRepository;
 use Symfony\Component\Uid\Uuid;
@@ -18,11 +18,11 @@ class EmployeeService
     {
     }
 
-    public function createEmployer(CreateEmployerRequestDto $createEmployerRequestDto): Uuid
+    public function createEmployer(CreateEmployeeRequestDto $createEmployeeRequestDto): Uuid
     {
-        $employee = $this->employeeFactory->createEmployer(
-            $createEmployerRequestDto->getName(),
-            $createEmployerRequestDto->getSurname()
+        $employee = $this->employeeFactory->createEmployee(
+            $createEmployeeRequestDto->getName(),
+            $createEmployeeRequestDto->getSurname()
         );
 
         $this->employeeRepository->save($employee);

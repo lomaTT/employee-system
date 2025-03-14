@@ -6,7 +6,7 @@ namespace App\Dto\Request;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class CreateEmployerRequestDto
+class CreateEmployeeRequestDto
 {
     public function __construct(
         #[Assert\NotNull(message: 'Name is required.')]

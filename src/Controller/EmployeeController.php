@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Dto\Request\CreateEmployerRequestDto;
+use App\Dto\Request\CreateEmployeeRequestDto;
 use App\Repository\EmployeeRepository;
 use App\Service\EmployeeService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -49,10 +49,10 @@ class EmployeeController extends AbstractController
         Request $request,
     ): Response
     {
-        /** @var CreateEmployerRequestDto $createEmployeeRequestDto */
+        /** @var CreateEmployeeRequestDto $createEmployeeRequestDto */
         $createEmployeeRequestDto = $this->serializer->deserialize(
             $request->getContent(),
-            CreateEmployerRequestDto::class,
+            CreateEmployeeRequestDto::class,
             'json'
         );
 
@@ -73,13 +73,13 @@ class EmployeeController extends AbstractController
 
         try {
             $employeeId = $this->employeeService->createEmployer($createEmployeeRequestDto);
-            $this->logger->info('Employer created', ['id' => $employeeId->toRfc4122()]);
+            $this->logger->info('Employee created', ['id' => $employeeId->toRfc4122()]);
 
             return new JsonResponse([
                 'id' => $employeeId->toRfc4122(),
             ]);
         } catch (Exception $e) {
-            $this->logger->error('Employer creation failed', ['error' => $e->getMessage()]);
+            $this->logger->error('Employee creation failed', ['error' => $e->getMessage()]);
 
             return new JsonResponse([
                 'error' => $e->getMessage(),

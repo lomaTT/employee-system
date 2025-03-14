@@ -8,15 +8,15 @@ use App\Entity\Employee;
 
 class EmployeeFactory
 {
-    public function createEmployer(
+    public function createEmployee(
         string $name,
         string $surname
     ): Employee {
-        $employer = new Employee();
-        $employer->setName($name);
-        $employer->setSurname($surname);
+        $employee = new Employee();
+        $employee->setName($name);
+        $employee->setSurname($surname);
 
-        return $employer;
+        return $employee;
     }
 
 }
