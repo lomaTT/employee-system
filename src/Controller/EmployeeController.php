@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Dto\Request\CreateEmployeeRequestDto;
 use App\Repository\EmployeeRepository;
 use App\Service\EmployeeService;
+use App\Service\ValidationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -17,17 +18,16 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Uid\Uuid;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class EmployeeController extends AbstractController
 {
     public function __construct(
-        public EmployeeRepository     $employeeRepository,
-        public EntityManagerInterface $entityManager,
-        public ValidatorInterface     $validator,
-        public SerializerInterface    $serializer,
-        private readonly EmployeeService $employeeService,
-        private readonly LoggerInterface $logger
+        public EmployeeRepository          $employeeRepository,
+        public EntityManagerInterface      $entityManager,
+        public SerializerInterface         $serializer,
+        private readonly EmployeeService   $employeeService,
+        private readonly LoggerInterface   $logger,
+        private readonly ValidationService $validationService
     )
     {
     }
@@ -56,19 +56,10 @@ class EmployeeController extends AbstractController
             'json'
         );
 
-        $violations = $this->validator->validate($createEmployeeRequestDto);
+        $validationResponse = $this->validationService->validate($createEmployeeRequestDto);
 
-        if (count($violations) > 0) {
-            $violationMessages = [];
-
-            foreach ($violations as $violation) {
-                $violationMessages[] = $violation->getMessage();
-            }
-
-            return new JsonResponse(
-                ['errors' => $violationMessages],
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
+        if ($validationResponse) {
+            return $validationResponse;
         }
 
         try {

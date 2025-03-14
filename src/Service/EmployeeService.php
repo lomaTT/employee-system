@@ -13,7 +13,7 @@ class EmployeeService
 {
     public function __construct(
         private EmployeeRepository $employeeRepository,
-        private EmployeeFactory $employeeFactory
+        private EmployeeFactory    $employeeFactory
     )
     {
     }
