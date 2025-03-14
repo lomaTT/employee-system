@@ -29,7 +29,7 @@ class Employee
     /**
      * @var Collection<int, WorkTime>
      */
-    #[ORM\OneToMany(targetEntity: WorkTime::class, mappedBy: 'employer', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: WorkTime::class, mappedBy: 'employee', orphanRemoval: true)]
     private Collection $workTimes;
 
     public function __construct()
@@ -85,7 +85,7 @@ class Employee
     {
         if (!$this->workTimes->contains($workTime)) {
             $this->workTimes->add($workTime);
-            $workTime->setEmployer($this);
+            $workTime->setEmployee($this);
         }
 
         return $this;
@@ -95,8 +95,8 @@ class Employee
     {
         if ($this->workTimes->removeElement($workTime)) {
             // set the owning side to null (unless already changed)
-            if ($workTime->getEmployer() === $this) {
-                $workTime->setEmployer(null);
+            if ($workTime->getEmployee() === $this) {
+                $workTime->setEmployee(null);
             }
         }
 
